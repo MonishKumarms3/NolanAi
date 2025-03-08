@@ -1,21 +1,54 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+/** @format */
+
+import React, { useEffect } from "react";
+import {
+	BrowserRouter as Router,
+	Routes,
+	Route,
+	useLocation,
+} from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import DashNav from "./components/DashNav";
+import KTComponent from "./metronic/core/index.spa";
+import KTLayout from "./metronic/app/layouts/demo1.js";
+import Project from "./pages/Project.jsx";
+import ScriptEditor from "./pages/ScriptEditor.jsx";
+function Layout() {
+	const location = useLocation();
 
-function App() {
+	const showNavbar =
+		location.pathname !== "/dashboard" &&
+		location.pathname !== "/project" &&
+		!/^\/editor\/\d+$/.test(location.pathname);
 
+	return (
+		<>
+			{showNavbar ? <Navbar /> : <DashNav />}
+			<Routes>
+				<Route path='/' element={<Home />} />
+				<Route path='/login' element={<Login />} />
+				<Route path='/dashboard' element={<Dashboard />} />
 
-  return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </Router>
-    
-  )
+				<Route path='/editor/:id' element={<ScriptEditor />} />
+			</Routes>
+		</>
+	);
 }
 
-export default App
+function App() {
+	useEffect(() => {
+		KTComponent.init();
+		KTLayout.init();
+	}, []);
+
+	return (
+		<Router>
+			<Layout />
+		</Router>
+	);
+}
+
+export default App;

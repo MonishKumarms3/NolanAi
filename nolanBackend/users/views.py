@@ -44,6 +44,8 @@ class GoogleAuthView(APIView):
 
     
             refresh = RefreshToken.for_user(user)
+            print(refresh.access_token)
+            print(refresh)
             
             return Response({
                 'access_token': str(refresh.access_token),
@@ -61,10 +63,11 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        try:
+        try:    
             refresh_token = request.data.get('refresh_token')
-            token = RefreshToken(refresh_token)
-            token.blacklist()
+            print(refresh_token)
+            
+            
             return Response({'message': 'Successfully logged out'})
         except Exception:
             return Response(

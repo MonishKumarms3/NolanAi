@@ -1,0 +1,21 @@
+/** @format */
+
+.dash-nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100vw;
+	height: 60px;
+	padding: 0 20px;
+	background: rgba(255, 255, 255, 0.2); /* 20% transparent white */
+	backdrop-filter: blur(10px);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
+	position: fixed;
+	top: 0;
+	left: 0;
+}
+
+.dash-nav__logo img {
+	height: 40px;
+}
