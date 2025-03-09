@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { MessageCircle, X } from "lucide-react";
 import { motion } from "framer-motion";
-import axios from "../api/axios"; // Ensure this is your axios instance
+import axios from "../api/axios"; 
 
 function ChatWidget() {
 	const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +13,7 @@ function ChatWidget() {
 	const handleSendMessage = async () => {
 		if (!input.trim()) return;
 
-		// Add user message to chat
+		
 		setMessages((prevMessages) => [
 			...prevMessages,
 			{ sender: "user", text: input },
