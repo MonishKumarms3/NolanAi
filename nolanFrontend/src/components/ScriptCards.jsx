@@ -39,7 +39,6 @@ function ScriptCards() {
 		navigate(`/editor/${id}`);
 	};
 
-	// Scroll functions
 	const scrollLeft = () => {
 		if (scrollRef.current) {
 			scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
