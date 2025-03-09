@@ -47,7 +47,7 @@
 	outline: none;
 	white-space: pre-wrap;
 	color: black;
-	margin-top: 100px; /* Adjust for toolbar height */
+	margin-top: 100px;
 }
 
 .editor:empty:before {
