@@ -12,7 +12,7 @@
     width: 100vw;
     height: 60px;
     padding: 0 20px;
-    background: rgba(255, 255, 255, 0.2); /* 20% transparent white */
+    background: rgba(255, 255, 255, 0.2); 
     backdrop-filter: blur(10px); 
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     z-index: 1000;
@@ -26,27 +26,25 @@
     height: auto;
 }
 
-/* Navigation links container */
+
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 20px; /* Adjust spacing between links */
+    gap: 20px; 
 }
 
-/* Navigation links */
 .nav-links a {
     text-decoration: none;
     font-size: 16px;
     font-weight: 500;
-    color: #000000; /* Adjust text color */
+    color: #000000; 
     transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
-    color: #007bff; /* Change color on hover */
+    color: #007bff; 
 }
 
-/* Login icon */
 .loginIcon {
     width: 40px;
     height: auto;
