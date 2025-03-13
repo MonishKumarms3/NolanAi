@@ -1,6 +1,5 @@
 /** @format */
 
-import { useEffect } from "react";
 import "./Login.css";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useDispatch, useSelector } from "react-redux";

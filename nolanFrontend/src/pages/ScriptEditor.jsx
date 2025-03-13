@@ -4,11 +4,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../api/axios";
 import { Toast } from "primereact/toast";
-import "primereact/resources/themes/saga-blue/theme.css"; // Choose a theme
+import "primereact/resources/themes/saga-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "./ScriptEditor.css";
 import ChatWidget from "../components/ChatWidget";
+import Editor from "./Editor";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import "./Editor.css";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import "tippy.js/themes/light.css";
+import { marked } from "marked";
 
 function ScriptEditor() {
 	const { id } = useParams();
@@ -17,9 +25,42 @@ function ScriptEditor() {
 	const [description, setDescription] = useState("");
 	const editorRef = useRef(null);
 	const navigate = useNavigate();
+
+	const toast = useRef(null);
+	const [value, setValue] = useState("");
+
+	const [selectedText, setSelectedText] = useState("");
 	const [popupVisible, setPopupVisible] = useState(false);
 	const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-	const toast = useRef(null);
+	const quillRef = useRef(null);
+
+	const [isOpen, setIsOpen] = useState(false);
+	const [messages, setMessages] = useState([]);
+
+	const toolbarOptions = [
+		["bold", "italic", "underline", "strike"],
+		["blockquote", "code-block"],
+		["link", "image", "video", "formula"],
+
+		[{ header: 1 }, { header: 2 }],
+		[{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+		[{ script: "sub" }, { script: "super" }],
+		[{ indent: "-1" }, { indent: "+1" }],
+		[{ direction: "rtl" }],
+
+		[{ size: ["small", false, "large", "huge"] }],
+		[{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+		[{ color: [] }, { background: [] }],
+		[{ font: [] }],
+		[{ align: [] }],
+
+		["clean"],
+	];
+
+	const module = {
+		toolbar: toolbarOptions,
+	};
 
 	useEffect(() => {
 		const fetchScript = async () => {
@@ -30,7 +71,8 @@ function ScriptEditor() {
 					setTitle(title);
 					setType(type);
 					setDescription(description);
-					editorRef.current.innerText = content;
+					const htmlContent = marked(content);
+					setValue(htmlContent);
 				} catch (error) {
 					console.error("Error fetching script:", error);
 				}
@@ -40,37 +82,13 @@ function ScriptEditor() {
 		fetchScript();
 	}, [id]);
 
-	const handleContentChange = () => {
-		const selection = window.getSelection();
-		if (selection.toString()) {
-			const range = selection.getRangeAt(0);
-			const rect = range.getBoundingClientRect();
-			setPopupPosition({ x: rect.left, y: rect.top - 40 });
-			setPopupVisible(true);
-		} else {
-			setPopupVisible(false);
-		}
-	};
-
-	const handleUndo = () => {
-		document.execCommand("undo");
-	};
-
-	const handleRedo = () => {
-		document.execCommand("redo");
-	};
-
-	const handleCopy = () => {
-		document.execCommand("copy");
-	};
-
 	const handleSave = async () => {
 		try {
 			const response = await axios.put(`/scripts/${id}/`, {
 				title,
 				type,
 				description,
-				content: editorRef.current.innerText,
+				content: value,
 			});
 			console.log("Script saved:", response.data);
 			toast.current.show({
@@ -102,8 +120,30 @@ function ScriptEditor() {
 	const applyStyle = (command) => {
 		document.execCommand(command);
 	};
+	const handleTextSelection = () => {
+		if (quillRef.current) {
+			const quill = quillRef.current.getEditor();
+			const selection = quill.getSelection();
 
-	const handleAIAction = async (action) => {
+			if (selection) {
+				const selectedText = quill.getText(selection.index, selection.length);
+
+				if (selectedText.trim()) {
+					const bounds = quill.getBounds(selection.index, selection.length);
+
+					setSelectedText(selectedText);
+					setPopupPosition({
+						x: bounds.left + bounds.width / 2 + 350,
+						y: bounds.bottom + 450,
+					});
+					setPopupVisible(true);
+				} else {
+					setPopupVisible(false);
+				}
+			}
+		}
+	};
+	const handleAIAction = async (action, adjustTone = "None") => {
 		const selectedText = window.getSelection().toString();
 		if (!selectedText) return;
 
@@ -117,17 +157,40 @@ function ScriptEditor() {
 					console.log("Generated Image URL:", response.data.url);
 					break;
 				case "fixGrammar":
+					setIsOpen(true);
+					setMessages((prevMessages) => [
+						...prevMessages,
+						{ sender: "user", text: selectedText + " (fix grammar)" },
+					]);
+
 					response = await axios.post("/ai/fix-grammar/", {
 						text: selectedText,
 					});
+					setMessages((prevMessages) => [
+						...prevMessages,
+						{ sender: "ai", text: response.data.correctedText },
+					]);
 					console.log("Corrected Text:", response.data.correctedText);
 					break;
 				case "adjustTone":
+					setIsOpen(true);
+					setMessages((prevMessages) => [
+						...prevMessages,
+						{
+							sender: "user",
+							text: selectedText + " (fix tone) " + adjustTone,
+						},
+					]);
 					response = await axios.post("/ai/adjust-tone/", {
 						text: selectedText,
-						tone: "dark",
+						tone: adjustTone,
 					});
-					console.log("Adjusted Text:", response.data.adjustedText);
+					console.log("Adjusted Text:", response.data.correctedText);
+					setMessages((prevMessages) => [
+						...prevMessages,
+						{ sender: "ai", text: response.data.correctedText },
+					]);
+
 					break;
 				default:
 					break;
@@ -137,30 +200,42 @@ function ScriptEditor() {
 		}
 	};
 
+	const AIActionButtons = () => (
+		<div className='flex space-x-2 bg-white rounded-lg p-2'>
+			<button
+				onClick={() => handleAIAction("fixGrammar")}
+				className='popupButton'>
+				<span>Fix Grammar</span>
+			</button>
+
+			<button
+				onClick={() => handleAIAction("generateImage")}
+				className='popupButton'>
+				<span>Generate Image</span>
+			</button>
+			<select
+				class='select'
+				name='select'
+				value={"None"}
+				onChange={(e) => {
+					handleAIAction("adjustTone", e.target.value);
+				}}>
+				<option value='None'>Adjust Tone</option>
+				<option value='Dark'>Dark</option>
+				<option value='Light'>Light</option>
+				<option value='Sad'>Sad</option>
+				<option value='Horror'>Horror</option>
+				<option value='Exciting'>Exciting</option>
+				<option value='Comic'>Comic</option>
+			</select>
+		</div>
+	);
 	return (
 		<div className='editor-container'>
 			<Toast ref={toast} />
-			<div className='toolbar mt-20'>
+			<div className='toolbar mt-25'>
 				<i
-					className='ki-duotone ki-arrow-circle-left text-black text-3xl'
-					data-tooltip='#undo'
-					data-tooltip-placement='bottom'
-					onClick={handleUndo}></i>
-				<div className='tooltip' id='undo'>
-					Undo
-				</div>
-
-				<i
-					className='ki-duotone ki-arrow-circle-right text-black text-3xl'
-					data-tooltip='#redo'
-					data-tooltip-placement='bottom'
-					onClick={handleRedo}></i>
-				<div className='tooltip' id='redo'>
-					Redo
-				</div>
-
-				<i
-					className='ki-duotone ki-file-up text-black text-3xl'
+					className='ki-duotone ki-file-up text-green-500 text-3xl'
 					data-tooltip='#upload'
 					data-tooltip-placement='bottom'
 					onClick={handleSave}></i>
@@ -168,22 +243,6 @@ function ScriptEditor() {
 					Save
 				</div>
 
-				<i
-					className='ki-duotone ki-copy text-black text-3xl'
-					data-tooltip='#copy'
-					data-tooltip-placement='bottom'
-					onClick={handleCopy}></i>
-				<div className='tooltip' id='copy'>
-					Copy
-				</div>
-
-				<i
-					className='ki-duotone ki-Delete-list text-black text-3xl'
-					data-tooltip='#search'
-					data-tooltip-placement='bottom'></i>
-				<div className='tooltip' id='search'>
-					Search
-				</div>
 				<i
 					className='ki-filled ki-delete-files text-red-500 text-3xl'
 					data-tooltip='#delete'
@@ -219,50 +278,47 @@ function ScriptEditor() {
 				className='input mt-2 max-w-[50%]'
 			/>
 
-			<div
-				className='editor'
-				contentEditable
-				ref={editorRef}
-				onMouseUp={handleContentChange}
-				placeholder='Start writing your script here...'></div>
+			<div className='editorContainer'>
+				<ReactQuill
+					ref={quillRef}
+					modules={module}
+					theme='snow'
+					value={value}
+					onChange={setValue}
+					onChangeSelection={handleTextSelection}
+				/>
+				{popupVisible && popupPosition.x !== 0 && (
+					<div
+						style={{
+							position: "absolute",
+							left: `${popupPosition.x}px`,
+							top: `${popupPosition.y}px`,
+							zIndex: 1000,
+						}}>
+						<Tippy
+							visible={true}
+							content={<AIActionButtons />}
+							placement='bottom'
+							theme='light'
+							interactive={true}>
+							<div
+								style={{
+									width: "10px",
+									height: "10px",
+									position: "absolute",
+								}}
+							/>
+						</Tippy>
+					</div>
+				)}
+			</div>
 
-			{popupVisible && (
-				<div
-					className='popup'
-					style={{ top: popupPosition.y, left: popupPosition.x }}>
-					<button onClick={() => applyStyle("bold")}>
-						<i className='ki-outline ki-text-bold text-black text-3xl'></i>
-					</button>
-
-					<button onClick={() => applyStyle("italic")}>
-						<i className='ki-outline ki-text-italic text-black text-3xl'></i>
-					</button>
-
-					<button onClick={() => applyStyle("underline")}>
-						<i className='ki-outline ki-text-underline text-black text-3xl'></i>
-					</button>
-
-					<button onClick={() => applyStyle("strikeThrough")}>
-						<i className='ki-outline ki-text-strikethrough text-black text-3xl'></i>
-					</button>
-
-					<button onClick={() => handleAIAction("generateImage")}>
-						<i className='ki-outline ki-frame text-black text-3xl'></i>
-					</button>
-					<button onClick={() => handleAIAction("fixGrammar")}>
-						<i className='ki-outline ki-pencil text-black text-3xl'></i>
-					</button>
-					<button onClick={() => handleAIAction("adjustTone")}>
-						<select className='select' name='select'>
-							<option value='dark'>Dark</option>
-							<option value='sad'>Sad</option>
-							<option value='comic'>Comic</option>
-							<option value='horror'>Horror</option>
-						</select>
-					</button>
-				</div>
-			)}
-			<ChatWidget />
+			<ChatWidget
+				isOpen={isOpen}
+				setIsOpen={setIsOpen}
+				messages={messages}
+				setMessages={setMessages}
+			/>
 		</div>
 	);
 }

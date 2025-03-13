@@ -3,17 +3,14 @@
 import React, { useState } from "react";
 import { MessageCircle, X } from "lucide-react";
 import { motion } from "framer-motion";
-import axios from "../api/axios"; // Ensure this is your axios instance
+import axios from "../api/axios";
 
-function ChatWidget() {
-	const [isOpen, setIsOpen] = useState(false);
-	const [messages, setMessages] = useState([]);
+function ChatWidget({ isOpen, setIsOpen, messages, setMessages }) {
 	const [input, setInput] = useState("");
 
 	const handleSendMessage = async () => {
 		if (!input.trim()) return;
 
-		// Add user message to chat
 		setMessages((prevMessages) => [
 			...prevMessages,
 			{ sender: "user", text: input },
@@ -66,16 +63,25 @@ function ChatWidget() {
 						{messages.map((msg, index) => (
 							<div key={index} className='mb-2'>
 								{msg.sender === "ai" ? (
-									<div className='input flex items-center'>
-										<input
+									<div className='flex items-start bg-gray-100 p-2 rounded'>
+										<textarea
 											id={`clipboard_${index}_target`}
-											type='text'
 											value={msg.text}
 											readOnly
-											className='w-full p-2 border rounded text-black'
+											className='w-full p-2 border rounded text-black resize-none overflow-hidden bg-white'
+											rows={1}
+											style={{ minHeight: "40px" }}
+											onFocus={(e) => {
+												e.target.style.height = "auto";
+												e.target.style.height = `${e.target.scrollHeight}px`;
+											}}
+											onChange={(e) => {
+												e.target.style.height = "auto";
+												e.target.style.height = `${e.target.scrollHeight}px`;
+											}}
 										/>
 										<button
-											className='btn btn-icon ml-2'
+											className='ml-2 text-black'
 											onClick={() => handleCopy(msg.text)}>
 											<i className='ki-outline ki-copy'></i>
 										</button>
@@ -88,7 +94,6 @@ function ChatWidget() {
 							</div>
 						))}
 					</div>
-
 					<input
 						type='text'
 						placeholder='Type a message...'

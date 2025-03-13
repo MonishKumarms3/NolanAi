@@ -1,7 +1,7 @@
 /** @format */
 
 import React, { useState } from "react";
-import axios from "../api/axios"; // Ensure this is your axios instance
+import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 function CreateScript() {
 	const [title, setTitle] = useState("");

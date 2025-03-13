@@ -1,0 +1,74 @@
+/** @format */
+
+.editorContainer {
+	width: calc(100% - 60px);
+	max-width: 800px;
+	margin: 60px auto 0;
+	min-height: calc(100vh - 160px);
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+	box-sizing: border-box;
+	background: white; /* Ensures background is white */
+	border-radius: 5px;
+}
+
+/* Editor text area */
+.ql-editor {
+	min-height: calc(100vh - 160px);
+	padding: 10px;
+	border-radius: 5px;
+	background: white !important; /* Force white background */
+}
+p {
+	color: black;
+}
+/* Toolbar styling */
+.ql-toolbar.ql-snow {
+	position: sticky;
+	top: 60px;
+	background-color: black !important;
+	color: white !important;
+	z-index: 100;
+	border-radius: 5px;
+	padding: 5px;
+}
+
+/* Ensure toolbar buttons are visible */
+.ql-toolbar.ql-snow button,
+.ql-toolbar.ql-snow .ql-picker-label {
+	color: white !important;
+}
+
+/* Dropdown background */
+.ql-toolbar.ql-snow .ql-picker-options {
+	background: white !important;
+	color: rgb(255, 255, 255) !important;
+}
+
+/* Override hover effects for visibility */
+.ql-toolbar.ql-snow button:hover,
+.ql-toolbar.ql-snow .ql-active {
+	background: gray !important;
+	color: rgb(255, 255, 255) !important;
+}
+
+/* Fix for placeholder text color (to make it black) */
+.ql-editor::before {
+	color: black !important;
+	opacity: 0.6 !important; /* Adjust opacity if needed */
+}
+.ql-picker-item {
+	color: black;
+}
+.popupButton {
+	background-color: rgb(229, 230, 231);
+	color: black;
+	border: none;
+	padding: auto;
+	border-radius: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100px;
+}

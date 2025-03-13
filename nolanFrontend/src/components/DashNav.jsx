@@ -46,11 +46,11 @@ function DashNav() {
 						</a>
 					</div>
 					<div className='menu-item'>
-						<a className='menu-link' href='/createScript'>
+						<a className='menu-link' href='/ai-editor'>
 							<span className='menu-icon'>
 								<i className='ki-filled ki-plus-circle'></i>
 							</span>
-							<span className='menu-title'>Start New Project</span>
+							<span className='menu-title'>Start New Project Using AI</span>
 						</a>
 					</div>
 
