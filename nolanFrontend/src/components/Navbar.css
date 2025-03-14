@@ -17,7 +17,7 @@
 	width: 100vw;
 	height: 60px;
 	padding: 0 20px;
-	background: rgba(255, 255, 255, 0.2);
+	background: rgba(255, 255, 255, 0.2); /* 20% transparent white */
 	backdrop-filter: blur(10px);
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 	z-index: 1000;
@@ -31,22 +31,23 @@
 	height: auto;
 }
 
+/* Navigation links container */
 .nav-links {
 	display: flex;
 	align-items: center;
-	gap: 20px;
+	gap: 20px; /* Adjust spacing between links */
 }
 
 .nav-links a {
 	text-decoration: none;
 	font-size: 16px;
 	font-weight: 500;
-	color: #000000;
+	color: #000000; /* Adjust text color */
 	transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
-	color: #007bff;
+	color: #007bff; /* Change color on hover */
 }
 
 .loginIcon {
