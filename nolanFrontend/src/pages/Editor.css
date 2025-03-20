@@ -9,21 +9,19 @@
 	flex-direction: column;
 	padding: 20px;
 	box-sizing: border-box;
-	background: white; /* Ensures background is white */
+	background: white; 
 	border-radius: 5px;
 }
 
-/* Editor text area */
 .ql-editor {
 	min-height: calc(100vh - 160px);
 	padding: 10px;
 	border-radius: 5px;
-	background: white !important; /* Force white background */
+	background: white !important; 
 }
 p {
 	color: black;
 }
-/* Toolbar styling */
 .ql-toolbar.ql-snow {
 	position: sticky;
 	top: 60px;
@@ -34,29 +32,27 @@ p {
 	padding: 5px;
 }
 
-/* Ensure toolbar buttons are visible */
+
 .ql-toolbar.ql-snow button,
 .ql-toolbar.ql-snow .ql-picker-label {
 	color: white !important;
 }
 
-/* Dropdown background */
 .ql-toolbar.ql-snow .ql-picker-options {
 	background: white !important;
 	color: rgb(255, 255, 255) !important;
 }
 
-/* Override hover effects for visibility */
+
 .ql-toolbar.ql-snow button:hover,
 .ql-toolbar.ql-snow .ql-active {
 	background: gray !important;
 	color: rgb(255, 255, 255) !important;
 }
 
-/* Fix for placeholder text color (to make it black) */
 .ql-editor::before {
 	color: black !important;
-	opacity: 0.6 !important; /* Adjust opacity if needed */
+	opacity: 0.6 !important;
 }
 .ql-picker-item {
 	color: black;
