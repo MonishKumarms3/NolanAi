@@ -47,7 +47,7 @@ function Editor() {
 					response = await axios.post("/ai/generate-image/", {
 						text: selectedText,
 					});
-					// Handle image generation
+			
 					break;
 				case "fixGrammar":
 					response = await axios.post("/ai/fix-grammar/", {
