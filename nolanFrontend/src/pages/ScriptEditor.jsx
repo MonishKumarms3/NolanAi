@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../api/axios";
 import { Toast } from "primereact/toast";
-import "primereact/resources/themes/saga-blue/theme.css"; // Choose a theme
+import "primereact/resources/themes/saga-blue/theme.css"; 
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "./ScriptEditor.css";
